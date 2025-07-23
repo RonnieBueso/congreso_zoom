@@ -1,13 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
   <head>
-    <title>Inicio - Congreso 2025</title>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inicio - Congreso 2025</title>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body class="flex flex-col items-center justify-center min-h-screen bg-white">
-    <h1 class="text-3xl font-bold text-purple-700">Bienvenido al Congreso 2025</h1>
-    <a href="moderador.html" class="mt-4 text-blue-600 underline">Ir al panel del moderador</a>
-    <a href="reunion.html" class="mt-2 text-blue-600 underline">Ir a la sala del expositor</a>
+  <body class="min-h-screen bg-gradient-to-br from-purple-100 to-white flex items-center justify-center">
+    <div class="bg-white shadow-2xl rounded-2xl p-10 max-w-md w-full text-center">
+      <h1 class="text-4xl font-extrabold text-purple-700 mb-6">🎓 Congreso 2025</h1>
+      <p class="text-gray-600 text-lg mb-8">Bienvenido, elige una opción para continuar:</p>
+
+      <div class="space-y-4">
+        <a href="moderador.html"
+          class="block w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold transition duration-200 shadow-md">
+          Panel del Moderador
+        </a>
+        <a href="reunion.html"
+          class="block w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition duration-200 shadow-md">
+          Sala del Expositor
+        </a>
+      </div>
+    </div>
   </body>
 </html>
