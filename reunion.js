@@ -1,7 +1,6 @@
 // reunion.js
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js';
 import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js';
-import { firebaseConfig } from './firebase-config.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyABt2aXGvlcP8Pyy-MEr2kZbHurcMuPX1I",
