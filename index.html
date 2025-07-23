@@ -1,139 +1,55 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Temporizador Congreso HPMM</title>
+<head>
+  <meta charset="UTF-8" />
+  <title>Congreso HPMM 2025</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fdfdfd;
+      text-align: center;
+      padding: 40px;
+    }
+    img {
+      max-width: 300px;
+      margin-bottom: 40px;
+    }
+    h1 {
+      color: #8e2f89;
+      margin-bottom: 10px;
+    }
+    .boton {
+      background-color: #8e2f89;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 10px;
+      margin: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .footer {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <img src="congreso.jpg" alt="Logo Congreso" />
+  <h1>Primer Congreso</h1>
+  <p>Hospital Psiquiátrico Mario Mendoza</p>
 
-    <!-- React CDN -->
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <div>
+    <a class="boton" href="reunion.html">Modo Expositor / Público</a>
+    <a class="boton" href="moderador.html">Modo Moderador</a>
+  </div>
 
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        background: #f9f9f9;
-        font-family: 'Arial', sans-serif;
-      }
-
-      .marco {
-        max-width: 700px;
-        margin: 40px auto;
-        border: 8px solid #8e2f89;
-        border-radius: 20px;
-        padding: 30px;
-        background-color: white;
-        box-shadow: 0 0 20px rgba(142, 47, 137, 0.3);
-        position: relative;
-      }
-
-      .logo-congreso {
-        display: block;
-        margin: 0 auto 20px auto;
-        max-width: 280px;
-      }
-
-      .titulo {
-        text-align: center;
-        color: #8e2f89;
-        font-size: 24px;
-        margin-bottom: 30px;
-      }
-
-      .boton {
-        background-color: #8e2f89;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        padding: 10px 20px;
-        margin: 5px auto;
-        cursor: pointer;
-        font-size: 16px;
-        display: block;
-      }
-
-      .temporizador {
-        font-size: 48px;
-        color: #8e2f89;
-        font-weight: bold;
-        text-align: center;
-        margin-top: 20px;
-      }
-
-      .footer {
-        font-size: 12px;
-        position: absolute;
-        bottom: 10px;
-        right: 15px;
-        color: #555;
-        font-style: italic;
-        text-align: right;
-        line-height: 1.2;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="root"></div>
-
-    <script type="text/javascript">
-      const e = React.createElement;
-
-      function App() {
-        const expositores = [
-          { id: 1, nombre: "Dra. Martínez", minutos: 5 },
-          { id: 2, nombre: "Dr. Gómez", minutos: 7 },
-          { id: 3, nombre: "Lic. Pérez", minutos: 4 },
-        ];
-
-        const [activo, setActivo] = React.useState(null);
-        const [timeLeft, setTimeLeft] = React.useState(0);
-
-        React.useEffect(() => {
-          if (activo !== null) {
-            setTimeLeft(expositores[activo].minutos * 60);
-          }
-        }, [activo]);
-
-        React.useEffect(() => {
-          if (timeLeft <= 0) return;
-          const interval = setInterval(() => {
-            setTimeLeft((prev) => {
-              if (prev === 1) {
-                alert(`⏰ Tiempo finalizado para ${expositores[activo].nombre}`);
-              }
-              return prev - 1;
-            });
-          }, 1000);
-          return () => clearInterval(interval);
-        }, [timeLeft, activo]);
-
-        return e("div", { className: "marco" },
-          e("img", {
-            src: "./congreso.jpg",
-            alt: "Logo Congreso",
-            className: "logo-congreso"
-          }),
-          e("div", { className: "titulo" }, "Control de Expositores"),
-
-          expositores.map((ex, i) =>
-            e("button", {
-              key: ex.id,
-              className: "boton",
-              onClick: () => setActivo(i),
-            }, `Iniciar turno: ${ex.nombre}`)
-          ),
-
-          activo !== null && e("div", { className: "temporizador" },
-            `${Math.floor(timeLeft / 60)}:${(timeLeft % 60).toString().padStart(2, "0")}`
-          ),
-
-          e("div", { className: "footer" },
-            "Hospital Psiquiátrico Mario Mendoza\nPrimer Congreso"
-          )
-        );
-      }
-
-      ReactDOM.createRoot(document.getElementById("root")).render(e(App));
-    </script>
-  </body>
+  <div class="footer">
+    Dra. María Guadalupe Romero Andrade (in memoriam)<br />
+    25 al 27 de AGOSTO, 2025
+  </div>
+</body>
 </html>

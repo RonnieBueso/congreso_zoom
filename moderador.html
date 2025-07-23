@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Control Moderador - Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: #f2f2f2;
+    }
+    input, button {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 100%;
+      max-width: 300px;
+    }
+    button {
+      background-color: #8e2f89;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    #controls {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Ingreso del Moderador</h2>
+  <input type="email" id="email" placeholder="Correo del moderador" />
+  <input type="password" id="password" placeholder="Contraseña" />
+  <button id="loginBtn">Iniciar sesión</button>
+
+  <div id="controls" style="display:none;">
+    <h3>Expositores</h3>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js';
+    import { getDatabase, ref, set } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js';
+    import { firebaseConfig } from './firebase-config.js';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    const loginBtn = document.getElementById('loginBtn');
+    loginBtn.onclick = () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          console.log("Autenticado");
+        })
+        .catch(err => {
+          alert("Error de autenticación: " + err.message);
+        });
+    };
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        document.getElementById('controls').style.display = 'block';
+        loginBtn.style.display = 'none';
+        document.getElementById('email').style.display = 'none';
+        document.getElementById('password').style.display = 'none';
+
+        const expositores = [
+          { nombre: "Dra. Martínez", minutos: 5 },
+          { nombre: "Dr. Gómez", minutos: 7 },
+          { nombre: "Lic. Pérez", minutos: 4 }
+        ];
+
+        const controlsDiv = document.getElementById('controls');
+        expositores.forEach(({ nombre, minutos }) => {
+          const btn = document.createElement('button');
+          btn.textContent = `Iniciar: ${nombre} (${minutos} min)`;
+          btn.onclick = () => {
+            const startTime = new Date().toISOString();
+            set(ref(db, 'current_speaker_turn'), {
+              speakerName: nombre,
+              assignedMinutes: minutos,
+              startTime: startTime
+            });
+          };
+          controlsDiv.appendChild(btn);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

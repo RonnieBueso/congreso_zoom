@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Temporizador Expositor</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+    }
+    #timer {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #8e2f89;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 12px;
+      font-size: 2em;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+  <div id="speaker-info" style="text-align:center; margin-top:20px; font-size:20px;"></div>
+  <div id="timer">--:--</div>
+
+  <script type="module">
+    import { listenToTurn } from './temporizador.js';
+
+    let countdownInterval;
+
+    function updateTimer(speakerData) {
+      const infoDiv = document.getElementById('speaker-info');
+      const timerDiv = document.getElementById('timer');
+
+      if (!speakerData) {
+        infoDiv.textContent = "Esperando información del expositor...";
+        timerDiv.textContent = "--:--";
+        clearInterval(countdownInterval);
+        return;
+      }
+
+      const { speakerName, assignedMinutes, startTime } = speakerData;
+      infoDiv.textContent = `Expositor: ${speakerName} | ${assignedMinutes} minutos`;
+      clearInterval(countdownInterval);
+
+      countdownInterval = setInterval(() => {
+        const now = Date.now();
+        const start = new Date(startTime).getTime();
+        const elapsed = now - start;
+        const remaining = Math.max(0, assignedMinutes * 60 * 1000 - elapsed);
+
+        const minutes = Math.floor(remaining / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
+        timerDiv.textContent = \`\${String(minutes).padStart(2,'0')}:\${String(seconds).padStart(2,'0')}\`;
+
+        if (remaining <= 0) {
+          clearInterval(countdownInterval);
+          infoDiv.textContent = `¡Tiempo de ${speakerName} terminado!`;
+        }
+      }, 1000);
+    }
+
+    listenToTurn(updateTimer);
+  </script>
+</body>
+</html>
