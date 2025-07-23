@@ -5,6 +5,6 @@ export const firebaseConfig = {
   projectId: "congreso2025-6be09",
   storageBucket: "congreso2025-6be09.firebasestorage.app",
   messagingSenderId: "334410660172",
-  appId: "1:334410660172:web:6c662660d39ed4346677e9",
-  measurementId: "G-Y485YY6XW9"
+  appId: "1:334410660172:web:c086b4ff39927c896677e9",
+  measurementId: "G-Z0WMLWQCY6"
 };

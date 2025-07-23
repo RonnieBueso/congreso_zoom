@@ -1,90 +1,51 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <title>Reunión en Vivo - Congreso</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 font-sans relative">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reunión - Expositor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://source.zoom.us/2.18.5/lib/vendor/react.min.js"></script>
+    <script src="https://source.zoom.us/2.18.5/lib/vendor/react-dom.min.js"></script>
+    <script src="https://source.zoom.us/2.18.5/lib/vendor/redux.min.js"></script>
+    <script src="https://source.zoom.us/2.18.5/lib/vendor/redux-thunk.min.js"></script>
+    <script src="https://source.zoom.us/2.18.5/lib/vendor/lodash.min.js"></script>
+    <script src="https://source.zoom.us/zoom-meeting-2.18.5.min.js"></script>
+    <script type="module" src="reunion.js"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start">
+    <header class="w-full bg-purple-700 text-white py-4 text-center">
+      <h2 class="text-2xl font-bold" id="presenter-name">Nombre del Expositor</h2>
+      <p id="presenter-role">Profesión o Cargo</p>
+    </header>
 
-  <div class="absolute top-4 left-4">
-    <img src="congreso.jpg" alt="Logo Congreso" class="w-24 rounded shadow" />
-  </div>
+    <main class="w-full max-w-6xl px-4 mt-6">
+      <div class="flex justify-center">
+        <img src="congreso.jpg" alt="Logo Congreso" class="w-[150px] h-[150px] -mb-12 z-10 relative" />
+      </div>
 
-  <div class="absolute top-4 right-4 text-right">
-    <h2 id="presentador-nombre" class="text-xl font-bold text-purple-800">---</h2>
-    <p id="presentador-titulo" class="text-sm text-gray-700">---</p>
-  </div>
+      <div id="zmmtg-root" class="my-6 w-full h-[70vh] z-0"></div>
 
-  <main class="flex flex-col items-center justify-center min-h-screen pt-28 pb-24 px-4">
-    <div class="w-full max-w-5xl aspect-video border-4 border-purple-700 rounded-xl overflow-hidden shadow-xl">
-      <iframe id="zoom-frame" src="" class="w-full h-full" allow="camera; microphone; fullscreen; speaker; display-capture"></iframe>
-    </div>
+      <div class="my-6 text-center">
+        <input
+          type="text"
+          id="zoom-signature"
+          placeholder="Pega aquí tu firma de Zoom"
+          class="border border-gray-300 px-4 py-2 w-full max-w-xl rounded text-black"
+        />
+        <button
+          id="join-meeting"
+          class="mt-4 bg-purple-700 hover:bg-purple-800 text-white px-6 py-2 rounded"
+        >
+          Iniciar reunión
+        </button>
+      </div>
+    </main>
 
-    <div id="speaker-info" class="mt-8 text-center text-lg text-gray-700">Esperando expositor...</div>
-  </main>
-
-  <div id="timer" class="fixed bottom-6 right-6 bg-purple-700 text-white text-3xl font-bold px-6 py-3 rounded-xl shadow-lg">
-    --:--
-  </div>
-
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js';
-    import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js';
-    import { firebaseConfig } from './firebase-config.js';
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const currentTurnRef = ref(db, 'current_speaker_turn');
-    const meetingRef = ref(db, 'zoom_meeting_url');
-
-    const timerDiv = document.getElementById('timer');
-    const infoDiv = document.getElementById('speaker-info');
-    const zoomFrame = document.getElementById('zoom-frame');
-    const presentadorNombre = document.getElementById('presentador-nombre');
-    const presentadorTitulo = document.getElementById('presentador-titulo');
-    let countdownInterval;
-
-    onValue(meetingRef, (snap) => {
-      const url = snap.val();
-      if (url && typeof url === 'string') {
-        zoomFrame.src = url;
-      }
-    });
-
-    onValue(currentTurnRef, (snapshot) => {
-      const data = snapshot.val();
-      if (!data) {
-        infoDiv.textContent = 'Esperando expositor...';
-        timerDiv.textContent = '--:--';
-        presentadorNombre.textContent = "---";
-        presentadorTitulo.textContent = "---";
-        clearInterval(countdownInterval);
-        return;
-      }
-
-      const { speakerName, assignedMinutes, startTime, title } = data;
-      infoDiv.textContent = `Expositor: ${speakerName} (${assignedMinutes} minutos)`;
-      presentadorNombre.textContent = speakerName || "---";
-      presentadorTitulo.textContent = title || "---";
-      clearInterval(countdownInterval);
-
-      countdownInterval = setInterval(() => {
-        const now = Date.now();
-        const start = new Date(startTime).getTime();
-        const elapsed = now - start;
-        const remaining = Math.max(0, assignedMinutes * 60 * 1000 - elapsed);
-
-        const minutes = Math.floor(remaining / 60000);
-        const seconds = Math.floor((remaining % 60000) / 1000);
-        timerDiv.textContent = `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
-
-        if (remaining <= 0) {
-          clearInterval(countdownInterval);
-          infoDiv.textContent = `¡Tiempo de ${speakerName} terminado!`;
-        }
-      }, 1000);
-    });
-  </script>
-</body>
+    <footer class="bg-purple-100 text-purple-900 w-full py-3 text-center">
+      <div id="speaker-topic">Tema: ...</div>
+      <div id="speaker-subtopic">Subtema: ...</div>
+      <div class="text-2xl font-bold mt-2" id="timer-display">--:--</div>
+    </footer>
+  </body>
 </html>
