@@ -2,14 +2,14 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Control Moderador - Login</title>
+  <title>Control Moderador</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 30px;
       background-color: #f2f2f2;
     }
-    input, button {
+    input, button, select {
       display: block;
       margin: 10px 0;
       padding: 10px;
@@ -17,7 +17,7 @@
       border-radius: 8px;
       border: 1px solid #ccc;
       width: 100%;
-      max-width: 300px;
+      max-width: 400px;
     }
     button {
       background-color: #8e2f89;
@@ -26,7 +26,7 @@
       cursor: pointer;
     }
     #controls {
-      margin-top: 20px;
+      margin-top: 30px;
     }
   </style>
 </head>
@@ -38,6 +38,13 @@
 
   <div id="controls" style="display:none;">
     <h3>Expositores</h3>
+    <select id="speakerSelect"></select>
+    <input type="number" id="minutesInput" placeholder="Minutos" min="1" />
+    <button id="startBtn">Iniciar turno</button>
+
+    <h3 style="margin-top:30px;">Link de reunión Zoom</h3>
+    <input type="text" id="zoomInput" placeholder="https://us06web.zoom.us/j/..." />
+    <button id="updateZoomBtn">Actualizar link Zoom</button>
   </div>
 
   <script type="module">
@@ -51,45 +58,63 @@
     const db = getDatabase(app);
 
     const loginBtn = document.getElementById('loginBtn');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const controls = document.getElementById('controls');
+    const speakerSelect = document.getElementById('speakerSelect');
+    const minutesInput = document.getElementById('minutesInput');
+    const startBtn = document.getElementById('startBtn');
+    const zoomInput = document.getElementById('zoomInput');
+    const updateZoomBtn = document.getElementById('updateZoomBtn');
+
+    const expositores = [
+      "Dra. Martínez",
+      "Dr. Gómez",
+      "Lic. Pérez"
+    ];
+
     loginBtn.onclick = () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+      const email = emailInput.value;
+      const password = passwordInput.value;
       signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          console.log("Autenticado");
-        })
-        .catch(err => {
-          alert("Error de autenticación: " + err.message);
-        });
+        .then(() => console.log("Autenticado"))
+        .catch(err => alert("Error: " + err.message));
     };
 
     onAuthStateChanged(auth, user => {
       if (user) {
-        document.getElementById('controls').style.display = 'block';
+        controls.style.display = 'block';
         loginBtn.style.display = 'none';
-        document.getElementById('email').style.display = 'none';
-        document.getElementById('password').style.display = 'none';
+        emailInput.style.display = 'none';
+        passwordInput.style.display = 'none';
 
-        const expositores = [
-          { nombre: "Dra. Martínez", minutos: 5 },
-          { nombre: "Dr. Gómez", minutos: 7 },
-          { nombre: "Lic. Pérez", minutos: 4 }
-        ];
-
-        const controlsDiv = document.getElementById('controls');
-        expositores.forEach(({ nombre, minutos }) => {
-          const btn = document.createElement('button');
-          btn.textContent = `Iniciar: ${nombre} (${minutos} min)`;
-          btn.onclick = () => {
-            const startTime = new Date().toISOString();
-            set(ref(db, 'current_speaker_turn'), {
-              speakerName: nombre,
-              assignedMinutes: minutos,
-              startTime: startTime
-            });
-          };
-          controlsDiv.appendChild(btn);
+        // llenar select de expositores
+        speakerSelect.innerHTML = "";
+        expositores.forEach(nombre => {
+          const opt = document.createElement('option');
+          opt.value = nombre;
+          opt.textContent = nombre;
+          speakerSelect.appendChild(opt);
         });
+
+        startBtn.onclick = () => {
+          const nombre = speakerSelect.value;
+          const minutos = parseInt(minutesInput.value);
+          if (!nombre || !minutos) return alert("Completa ambos campos");
+
+          const startTime = new Date().toISOString();
+          set(ref(db, 'current_speaker_turn'), {
+            speakerName: nombre,
+            assignedMinutes: minutos,
+            startTime: startTime
+          });
+        };
+
+        updateZoomBtn.onclick = () => {
+          const url = zoomInput.value;
+          if (!url.startsWith("http")) return alert("URL inválida");
+          set(ref(db, 'zoom_meeting_url'), url);
+        };
       }
     });
   </script>

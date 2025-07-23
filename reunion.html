@@ -2,49 +2,71 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Temporizador Expositor</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-    }
-    #timer {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #8e2f89;
-      color: white;
-      padding: 15px 20px;
-      border-radius: 12px;
-      font-size: 2em;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    }
-  </style>
+  <title>Reunión en Vivo - Congreso</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <div id="speaker-info" style="text-align:center; margin-top:20px; font-size:20px;"></div>
-  <div id="timer">--:--</div>
+<body class="bg-gray-100 font-sans relative">
+
+  <div class="absolute top-4 left-4">
+    <img src="congreso.jpg" alt="Logo Congreso" class="w-24 rounded shadow" />
+  </div>
+
+  <div class="absolute top-4 right-4 text-right">
+    <h2 id="presentador-nombre" class="text-xl font-bold text-purple-800">---</h2>
+    <p id="presentador-titulo" class="text-sm text-gray-700">---</p>
+  </div>
+
+  <main class="flex flex-col items-center justify-center min-h-screen pt-28 pb-24 px-4">
+    <div class="w-full max-w-5xl aspect-video border-4 border-purple-700 rounded-xl overflow-hidden shadow-xl">
+      <iframe id="zoom-frame" src="" class="w-full h-full" allow="camera; microphone; fullscreen; speaker; display-capture"></iframe>
+    </div>
+
+    <div id="speaker-info" class="mt-8 text-center text-lg text-gray-700">Esperando expositor...</div>
+  </main>
+
+  <div id="timer" class="fixed bottom-6 right-6 bg-purple-700 text-white text-3xl font-bold px-6 py-3 rounded-xl shadow-lg">
+    --:--
+  </div>
 
   <script type="module">
-    import { listenToTurn } from './temporizador.js';
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js';
+    import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js';
+    import { firebaseConfig } from './firebase-config.js';
 
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const currentTurnRef = ref(db, 'current_speaker_turn');
+    const meetingRef = ref(db, 'zoom_meeting_url');
+
+    const timerDiv = document.getElementById('timer');
+    const infoDiv = document.getElementById('speaker-info');
+    const zoomFrame = document.getElementById('zoom-frame');
+    const presentadorNombre = document.getElementById('presentador-nombre');
+    const presentadorTitulo = document.getElementById('presentador-titulo');
     let countdownInterval;
 
-    function updateTimer(speakerData) {
-      const infoDiv = document.getElementById('speaker-info');
-      const timerDiv = document.getElementById('timer');
+    onValue(meetingRef, (snap) => {
+      const url = snap.val();
+      if (url && typeof url === 'string') {
+        zoomFrame.src = url;
+      }
+    });
 
-      if (!speakerData) {
-        infoDiv.textContent = "Esperando información del expositor...";
-        timerDiv.textContent = "--:--";
+    onValue(currentTurnRef, (snapshot) => {
+      const data = snapshot.val();
+      if (!data) {
+        infoDiv.textContent = 'Esperando expositor...';
+        timerDiv.textContent = '--:--';
+        presentadorNombre.textContent = "---";
+        presentadorTitulo.textContent = "---";
         clearInterval(countdownInterval);
         return;
       }
 
-      const { speakerName, assignedMinutes, startTime } = speakerData;
-      infoDiv.textContent = `Expositor: ${speakerName} | ${assignedMinutes} minutos`;
+      const { speakerName, assignedMinutes, startTime, title } = data;
+      infoDiv.textContent = `Expositor: ${speakerName} (${assignedMinutes} minutos)`;
+      presentadorNombre.textContent = speakerName || "---";
+      presentadorTitulo.textContent = title || "---";
       clearInterval(countdownInterval);
 
       countdownInterval = setInterval(() => {
@@ -55,16 +77,14 @@
 
         const minutes = Math.floor(remaining / 60000);
         const seconds = Math.floor((remaining % 60000) / 1000);
-        timerDiv.textContent = \`\${String(minutes).padStart(2,'0')}:\${String(seconds).padStart(2,'0')}\`;
+        timerDiv.textContent = `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
 
         if (remaining <= 0) {
           clearInterval(countdownInterval);
           infoDiv.textContent = `¡Tiempo de ${speakerName} terminado!`;
         }
       }, 1000);
-    }
-
-    listenToTurn(updateTimer);
+    });
   </script>
 </body>
 </html>
