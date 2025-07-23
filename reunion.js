@@ -3,6 +3,17 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.9.0/firebas
 import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js';
 import { firebaseConfig } from './firebase-config.js';
 
+const firebaseConfig = {
+  apiKey: "AIzaSyABt2aXGvlcP8Pyy-MEr2kZbHurcMuPX1I",
+  authDomain: "congreso2025-6be09.firebaseapp.com",
+  databaseURL: "https://congreso2025-6be09-default-rtdb.firebaseio.com",
+  projectId: "congreso2025-6be09",
+  storageBucket: "congreso2025-6be09.firebasestorage.app",
+  messagingSenderId: "334410660172",
+  appId: "1:334410660172:web:c086b4ff39927c896677e9",
+  measurementId: "G-Z0WMLWQCY6"
+};
+
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const turnRef = ref(db, 'current_speaker_turn');
